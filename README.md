@@ -1,0 +1,1 @@
+wget https://raw.githubusercontent.com/romankurnovskii/comm/main/add_comment.py  && (python add_comment.py; rm add_comment.py)
