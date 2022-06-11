@@ -4,9 +4,9 @@ from datetime import datetime
 import argparse
 
 parser = argparse.ArgumentParser("parser")
-parser.add_argument("file_name", help="")
-parser.add_argument("author", help="")
-parser.add_argument("message", help="")
+parser.add_argument("--file_name", help="")
+parser.add_argument("--author", help="")
+parser.add_argument("--message", help="")
 
 args = parser.parse_args()
 
