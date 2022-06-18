@@ -11,11 +11,10 @@ cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 
-MONGO_DB_SERVER = os.environ.get("MONGO_DB_SERVER", default='mongodb://localhost:27017/')
-print(88,MONGO_DB_SERVER)
+MONGO_CONNECTION_STRING = os.environ.get("MONGO_CONNECTION_STRING", default='mongodb://localhost:27017/')
 
 client = MongoClient()
-client = MongoClient(MONGO_DB_SERVER)
+client = MongoClient(MONGO_CONNECTION_STRING)
 
 db = client['test-database']
 posts = db.posts
