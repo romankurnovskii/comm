@@ -113,9 +113,6 @@ def comments_handler():
 @app.route("/")
 def hello_world():
     r = request.args
-    pprint.pprint([request.url, request.url_root, '----',request.path])
-    # data = request.get_json()
-    pprint.pprint(r)
     return f"<p>Hello, World!{r}</p>"
 
 
