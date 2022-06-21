@@ -28,6 +28,15 @@ print(17, comments)
 def get_page_comments(page):
     return comments.find_one({"page": page}, {"_id":0})
 
+def update_page_view_count(page):
+    comments.update_one(
+        {"page": page},
+        {
+            "$inc": {"views": 1}, 
+            "$set": {"views": 1}
+        },
+    upsert=True)
+
 
 def create_page_comment(comment, page=None, author=None, parent_id=None):
     comment_data = {
@@ -87,7 +96,6 @@ def comments_handler():
 
     if request.method == 'POST':
         comment_data = request.get_json()
-        print(91, comment_data)
         comment = comment_data.get("comment")
         if comment:
             author = comment_data.get("author") or "Anonymous"
@@ -95,11 +103,14 @@ def comments_handler():
             comment_id = create_page_comment(comment, referrer, author ,parent_id)
             print('created comment', comment_id)
     elif request.method == 'GET':
+        update_page_view_count(referrer)
         comments_data = []
-        comments = get_page_comments(referrer)
-        if  comments:
-            comments_data = [comment for comment in comments.get("comments", [])]
-        return {"page": referrer, "comments": comments_data}
+        result = {"page": referrer, "comments": comments_data}
+        comments_fetched = get_page_comments(referrer)
+        if  comments_fetched:
+            comments_data = [comment for comment in comments_fetched.get("comments", [])]
+            result['page_views'] = comments.get('views', 0)
+        return result
 
 
     # comments_data = [comment for comment in comments]
