@@ -32,8 +32,8 @@ def update_page_view_count(page):
     comments.update_one(
         {"page": page},
         {
-            "$inc": {"views": 1}, 
-            "$set": {"views": 1}
+            "$inc": {"views": 1},
+            "$setOnInsert": {"views": 1}
         },
     upsert=True)
 
