@@ -33,9 +33,8 @@ def update_page_view_count(page):
         {"page": page},
         {
             "$inc": {"views": 1},
-            "$setOnInsert": {"views": 1}
         },
-    upsert=True)
+        upsert=True)
 
 
 def create_page_comment(comment, page=None, author=None, parent_id=None):
@@ -109,7 +108,8 @@ def comments_handler():
         comments_fetched = get_page_comments(referrer)
         if  comments_fetched:
             comments_data = [comment for comment in comments_fetched.get("comments", [])]
-            result['page_views'] = comments.get('views', 0)
+            result['page_views'] = comments_fetched.get('views', 0)
+            result['comments'] = comments_data
         return result
 
 
