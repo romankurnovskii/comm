@@ -2,9 +2,7 @@ import os
 from flask import request,Flask,render_template,redirect
 from flask_cors import CORS, cross_origin
 from pymongo import MongoClient
-from bson import json_util 
 import datetime
-import pprint
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -12,11 +10,12 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 
 MONGO_CONNECTION_STRING = os.environ.get("MONGO_CONNECTION_STRING", default='mongodb://localhost:27017/')
+MONGO_DB_COLLECTION = os.environ.get("MONGO_DB_COLLECTION", default="test-database")
 
 client = MongoClient()
 client = MongoClient(MONGO_CONNECTION_STRING)
 
-db = client['test-database']
+db = client[MONGO_DB_COLLECTION]
 posts = db.posts
 domains = db.domains
 pages = db.pages
