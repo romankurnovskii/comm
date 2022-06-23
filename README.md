@@ -6,6 +6,10 @@ python -m venv env
 . env/bin/activate
 
 
+set env:
+MONGO_CONNECTION_STRING
+MONGO_DB_COLLECTION
+
 
 pip freeze > requirements.txt
 
