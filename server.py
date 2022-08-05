@@ -159,23 +159,25 @@ def getAws(query):
         question_id = q["questionId"]
 
         q = getQuestionData(question_id)["data"]["question"]
-        print(question_id, q)
         title = q["title"]
         body = q["body"]
         date = q["updatedAt"]
         author = q["author"]["displayName"]
-        comments = q["comments"]
 
         comment = "<b>" + title + "</b></br>" + body
         comments.append({author: author, comment: comment, date: date})
 
-        for a in comments:
-            author = a["author"]["displayName"]
-            body = a["body"]
-            date = a["updatedAt"]
+        q_comments = q.get("comments", [])
+        q_answers = q.get("answers", [])
 
-            comment = body
-            comments.append({author: author, comment: comment, date: date})
+        for ans in [q_comments, q_answers]:
+            for a in ans:
+                author = a["author"]["displayName"]
+                body = a["body"]
+                date = a["updatedAt"]
+
+                comment = body
+                comments.append({author: author, comment: comment, date: date})
 
     return comments
 
