@@ -164,7 +164,7 @@ def getAws(query):
         author = q["author"]["displayName"]
 
         comment = "<b>" + title + "</b></br>" + body
-        comments.append({author: author, comment: comment, date: date})
+        comments.append({"author": author, "comment": "comment", date: date})
 
         q_comments = q.get("comments", [])
         q_answers = q.get("answers", [])
@@ -176,7 +176,7 @@ def getAws(query):
                 date = a["updatedAt"]
 
                 comment = body
-                comments.append({author: author, comment: comment, date: date})
+                comments.append({"author": author, "comment": comment, "date": date})
 
     return comments
 
@@ -185,8 +185,7 @@ def getAws(query):
 def aws_handler():
     tag = request.args.get("tag")
     aws_comments = getAws(tag)
-    print(aws_comments)
-    return {"data": {"comments": aws_comments}}
+    return {"comments": aws_comments}
 
 
 @app.route("/")
