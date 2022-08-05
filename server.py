@@ -154,7 +154,6 @@ def getAws(query):
     res = listQuestions(tag_id)
 
     questions = res["data"]["questions"]
-    print(questions[:1])
     for q in questions:
         question_id = q["questionId"]
 
@@ -185,8 +184,9 @@ def getAws(query):
 @app.route("/aws/getTagQuestions", methods=["GET"])
 def aws_handler():
     tag = request.args.get("tag")
-    comments = getAws(tag)
-    return comments
+    aws_comments = getAws(tag)
+    print(aws_comments)
+    return {"data": {"comments": aws_comments}}
 
 
 @app.route("/")
