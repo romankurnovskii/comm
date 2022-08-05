@@ -170,17 +170,17 @@ def getAws(query):
         
         q_answers = q.get("answers", [])
 
-        for ans in q_answers:
-            for a in ans:
-                author = a["author"]["displayName"]
-                body = a["body"]
-                date = a["updatedAt"]
-                q_comments = q.get("comments", [])
+        for a in q_answers:
+            author = a["author"]["displayName"]
+            body = a["body"]
+            date = a["updatedAt"]
 
-                comment = body
-                comments.append({"author": author, "comment": comment, "date": date})
+            comment = body
+            comments.append({"author": author, "comment": comment, "date": date})
 
-                if q_comments:
+            q_comments = q.get("comments", [])
+            if q_comments:
+                for a in q_comments:
                     author = a["author"]["displayName"]
                     body = a["body"]
                     date = a["updatedAt"]
