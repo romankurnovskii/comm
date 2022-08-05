@@ -187,7 +187,8 @@ def getAws(query):
                     comment = body
                     comments.append({"author": author, "comment": comment, "date": date})
 
-    comments = sorted(comments, key=lambda x: x["date"], reverse=False)
+    print(comments)
+    comments.sort( key=lambda x: x["date"], reverse=False)
     return comments
 
 
