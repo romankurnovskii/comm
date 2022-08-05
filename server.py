@@ -132,7 +132,6 @@ def getAws(query):
             "maxResults": 1,
             "pagingTokenRange": 5,
             "query": query,
-            "sort": "ascending",
         }
         return getRequstData(url, payload)
 
