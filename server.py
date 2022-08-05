@@ -3,6 +3,7 @@ from flask import request,Flask,render_template,redirect
 from flask_cors import CORS, cross_origin
 from pymongo import MongoClient
 import datetime
+import requests
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -20,9 +21,6 @@ posts = db.posts
 domains = db.domains
 pages = db.pages
 comments = db['comments']
-
-print(17, comments)
-
 
 def get_page_comments(page):
     return comments.find_one({"page": page}, {"_id":0})
@@ -120,9 +118,31 @@ def comments_handler():
     return {}
 
 
+
+
+def getAws():
+    tag = 'codestar'
+    urlGetTagsPageData = 'https://repost.aws/api/v1/webClient/getTagsPageData'
+    tagsPageDataPayload = {
+		"maxResults": 90,
+		"pagingTokenRange": 5,
+		"query": tag,
+		"sort": "ascending"
+	}
+
+    x = requests.post(urlGetTagsPageData, json = tagsPageDataPayload)
+    print(x.text)
+    try:
+        print(x.json)
+    except Exception as e:
+        print(e)
+
+        
+
 @app.route("/")
 def hello_world():
     r = request.args
+    getAws()
     return f"<p>Hello, World!{r}</p>"
 
 
