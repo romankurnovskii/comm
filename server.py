@@ -154,11 +154,12 @@ def getAws(query):
     res = listQuestions(tag_id)
 
     questions = res["data"]["questions"]
-    print(questions[:2])
+    print(questions[:1])
     for q in questions:
         question_id = q["questionId"]
 
         q = getQuestionData(question_id)["data"]["question"]
+        print(question_id, q)
         title = q["title"]
         body = q["body"]
         date = q["updatedAt"]
