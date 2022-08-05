@@ -178,7 +178,7 @@ def getAws(query):
             comment = body
             comments.append({"author": author, "comment": comment, "date": date})
 
-            q_comments = q.get("comments", [])
+            q_comments = a.get("comments", [])
             if q_comments:
                 for a in q_comments:
                     author = a["author"]["displayName"]
