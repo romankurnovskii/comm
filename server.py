@@ -185,15 +185,13 @@ def getAws(query):
 @app.route("/aws/getTagQuestions", methods=["GET"])
 def aws_handler():
     tag = request.args.get("tag")
-    getAws(tag)
-
-    return f"<p>Hello, World!{r}</p>"
+    comments = getAws(tag)
+    return comments
 
 
 @app.route("/")
 def hello_world():
     r = request.args
-    getAws()
     return f"<p>Hello, World!{r}</p>"
 
 
