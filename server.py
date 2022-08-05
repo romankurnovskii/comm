@@ -142,13 +142,10 @@ def getAws(query):
         }
         return getRequstData(url, payload)
 
-    def getQuestionData(tag_id):
+    def getQuestionData(question_id):
         url = "https://repost.aws/api/v1/webClient/getQuestionData"
         payload = {
-            "maxResults": 10,
-            "pagingTokenRange": 5,
-            "tagId": tag_id,
-            "view": "all",
+            "questionId": question_id,
         }
         return getRequstData(url, payload)
 
