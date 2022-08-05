@@ -113,43 +113,49 @@ def comments_handler():
     return {}
 
 
-def getAws(tag):
+def getAws(query):
     comments = []
 
-    def getQuestionData(tag_id):
-        urlGetQuestionData = "https://repost.aws/api/v1/webClient/getQuestionData"
+    def getRequstData(url, payload):
+        res = requests.post(url, json=payload)
+        res = res.json()
+        print(url, res)
+        return res
+
+    def getTagsPageData(query):
+        url = "https://repost.aws/api/v1/webClient/getTagsPageData"
+        payload = {
+            "maxResults": 90,
+            "pagingTokenRange": 5,
+            "query": query,
+            "sort": "ascending",
+        }
+        return getRequstData(url, payload)
+
+    def listQuestions(tag_id):
+        url = "https://repost.aws/api/v1/webClient/listQuestions"
         payload = {
             "maxResults": 10,
             "pagingTokenRange": 5,
             "tagId": tag_id,
             "view": "all",
         }
-        res = requests.post(urlGetQuestionData, json=payload)
-        res = res.json()
-        return res
+        return getRequstData(url, payload)
 
-    urlGetTagsPageData = "https://repost.aws/api/v1/webClient/getTagsPageData"
-    tagsPageDataPayload = {
-        "maxResults": 90,
-        "pagingTokenRange": 5,
-        "query": tag,
-        "sort": "ascending",
-    }
+    def getQuestionData(tag_id):
+        url = "https://repost.aws/api/v1/webClient/getQuestionData"
+        payload = {
+            "maxResults": 10,
+            "pagingTokenRange": 5,
+            "tagId": tag_id,
+            "view": "all",
+        }
+        return getRequstData(url, payload)
 
-    urlListQuestions = "https://repost.aws/api/v1/webClient/listQuestions"
-
-
-    def getQuestionDataPayload(tag_id):
-        return {"maxResults": 90, "pagingTokenRange": 5, "tagId": tag_id, "view": "all"}
-
-    res = requests.post(urlGetTagsPageData, json=tagsPageDataPayload)
-    res = res.json()
-
+    res = getTagsPageData(query)
     tag_id = res["data"]["tags"][0]["tagId"]
+    res = listQuestions(tag_id)
 
-    # get listQuestions
-    res = requests.post(urlListQuestions, json=getQuestionDataPayload(tag_id))
-    res = res.json()
     questions = res["data"]["questions"]
     for q in questions:
         question_id = q["questionId"]
