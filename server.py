@@ -116,6 +116,9 @@ def comments_handler():
 def getAws(query):
     comments = []
 
+    def comments_append(author, comment, date):
+        comments.append({"author": author, "comment": comment, "date": date})
+
     def getRequstData(url, payload):
         res = requests.post(url, json=payload)
         res = res.json()
@@ -139,7 +142,7 @@ def getAws(query):
             "pagingTokenRange": 5,
             "tagId": tag_id,
             "view": "all",
-            "sort": "descending"
+            "sort": "descending",
         }
         return getRequstData(url, payload)
 
@@ -165,9 +168,8 @@ def getAws(query):
         author = q["author"]["displayName"]
 
         comment = "<b>" + title + "</b></br>" + body
-        comments.append({"author": author, "comment": "comment", date: date})
+        comments_append(author, comment, date)
 
-        
         q_answers = q.get("answers", [])
 
         for a in q_answers:
@@ -176,7 +178,7 @@ def getAws(query):
             date = a["updatedAt"]
 
             comment = body
-            comments.append({"author": author, "comment": comment, "date": date})
+            comments_append(author, comment, date)
 
             q_comments = a.get("comments", [])
             if q_comments:
@@ -185,10 +187,10 @@ def getAws(query):
                     body = a["body"]
                     date = a["updatedAt"]
                     comment = body
-                    comments.append({"author": author, "comment": comment, "date": date})
+                    comments_append(author, comment, date)
 
     print(comments)
-    comments.sort( key=lambda x: x["date"], reverse=False)
+    comments.sort(key=lambda x: x["date"], reverse=False)
     return comments
 
 
