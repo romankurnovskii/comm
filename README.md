@@ -18,9 +18,7 @@ export FLASK_APP=server
 export FLASK_ENV=development
 flask run
 
-
 docker pull mongo:5.0.9
-
 
 docker run -d --rm  --name test-mongo mongo:5.0.9 --port 8000
 docker exec -it <CONTAINER_NAME> bash
@@ -32,8 +30,6 @@ docker run -d \
     --name test-mongo \
     -v data-vol:/data/db \
     mongo:5.0.9
-
-
 
 docker run -d --network my-network --name mylocalmongo \
 	-e MONGO_INITDB_ROOT_USERNAME=mongoadmin \
