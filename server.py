@@ -123,7 +123,6 @@ def getAws(query):
     def getRequstData(url, payload):
         res = requests.post(url, json=payload)
         res = res.json()
-        # print(url, res)
         return res
 
     def getTagsPageData(query):
@@ -142,7 +141,6 @@ def getAws(query):
             "pagingTokenRange": 5,
             "tagId": tag_id,
             "view": "all",
-            "sort": "descending",
         }
         return getRequstData(url, payload)
 
