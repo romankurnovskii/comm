@@ -1,9 +1,10 @@
-import os
+import datetime
 from flask import request, Flask, render_template, redirect
 from flask_cors import CORS, cross_origin
+import os
 from pymongo import MongoClient
-import datetime
 import requests
+
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -128,7 +129,7 @@ def getAws(query):
     def getTagsPageData(query):
         url = "https://repost.aws/api/v1/webClient/getTagsPageData"
         payload = {
-            "maxResults": 90,
+            "maxResults": 1,
             "pagingTokenRange": 5,
             "query": query,
             "sort": "ascending",
@@ -138,7 +139,7 @@ def getAws(query):
     def listQuestions(tag_id):
         url = "https://repost.aws/api/v1/webClient/listQuestions"
         payload = {
-            "maxResults": 10,
+            "maxResults": 5,
             "pagingTokenRange": 5,
             "tagId": tag_id,
             "view": "all",
@@ -172,7 +173,7 @@ def getAws(query):
 
         q_answers = q.get("answers", [])
 
-        for a in q_answers:
+        for a in q_answers[:-10]:
             author = a["author"]["displayName"]
             body = a["body"]
             date = a["updatedAt"]
@@ -182,14 +183,13 @@ def getAws(query):
 
             q_comments = a.get("comments", [])
             if q_comments:
-                for a in q_comments:
+                for a in q_comments[:-10]:
                     author = a["author"]["displayName"]
                     body = a["body"]
                     date = a["updatedAt"]
                     comment = body
                     comments_append(author, comment, date)
 
-    print(comments)
     comments.sort(key=lambda x: x["date"], reverse=False)
     return comments
 
