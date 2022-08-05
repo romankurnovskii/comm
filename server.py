@@ -139,6 +139,7 @@ def getAws(query):
             "pagingTokenRange": 5,
             "tagId": tag_id,
             "view": "all",
+            "sort": "descending"
         }
         return getRequstData(url, payload)
 
@@ -166,18 +167,27 @@ def getAws(query):
         comment = "<b>" + title + "</b></br>" + body
         comments.append({"author": author, "comment": "comment", date: date})
 
-        q_comments = q.get("comments", [])
+        
         q_answers = q.get("answers", [])
 
-        for ans in [q_comments, q_answers]:
+        for ans in q_answers:
             for a in ans:
                 author = a["author"]["displayName"]
                 body = a["body"]
                 date = a["updatedAt"]
+                q_comments = q.get("comments", [])
 
                 comment = body
                 comments.append({"author": author, "comment": comment, "date": date})
 
+                if q_comments:
+                    author = a["author"]["displayName"]
+                    body = a["body"]
+                    date = a["updatedAt"]
+                    comment = body
+                    comments.append({"author": author, "comment": comment, "date": date})
+
+    comments = sorted(comments, key=lambda x: x["date"], reverse=False)
     return comments
 
 
