@@ -119,7 +119,7 @@ def getAws(query):
     def getRequstData(url, payload):
         res = requests.post(url, json=payload)
         res = res.json()
-        print(url, res)
+        # print(url, res)
         return res
 
     def getTagsPageData(query):
@@ -154,6 +154,7 @@ def getAws(query):
     res = listQuestions(tag_id)
 
     questions = res["data"]["questions"]
+    print(questions[:2])
     for q in questions:
         question_id = q["questionId"]
 
