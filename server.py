@@ -193,9 +193,6 @@ def getAws(query):
 def comments_handler():
 
     comment_page = request.args.get("page")
-
-    comment_page = "http://localhost:1313/ru/posts/python-snippets/"
-
     request_domain = request.referrer
 
     comment = None
