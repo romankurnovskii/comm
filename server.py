@@ -1,10 +1,11 @@
 import datetime
-from flask import request, Flask, render_template, redirect
-from flask_cors import CORS, cross_origin
 import os
-from pymongo import MongoClient
 import requests
 
+from flask import request, Flask, Blueprint
+from flask_cors import CORS
+from urllib.parse import urlparse
+from pymongo import MongoClient
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -20,14 +21,22 @@ client = MongoClient()
 client = MongoClient(MONGO_CONNECTION_STRING)
 
 db = client[MONGO_DB_COLLECTION]
-posts = db.posts
-domains = db.domains
 pages = db.pages
+domains = db["domains"]
 comments = db["comments"]
+
+v1 = Blueprint("version1", "version1")
+v2 = Blueprint("version2", "version2")
+
+
+def get_date():
+    return datetime.datetime.utcnow()
 
 
 def get_page_comments(page):
-    return comments.find_one({"page": page}, {"_id": 0})
+    return comments.find_one(
+        {"page": page}, {"_id": 1, "comments": 1, "page": 1, "views": 1}
+    )
 
 
 def update_page_view_count(page):
@@ -40,33 +49,58 @@ def update_page_view_count(page):
     )
 
 
+def set_parrent_comment(page, parent_id, comment):
+    comments_page = comments.find_one({"page": page})
+    if comments_page:
+        if tmp_comments := comments_page.get("comments"):
+            for c in tmp_comments:
+                if c["id"] == parent_id:
+                    children = c.get("comments", [])
+                    children.append(comment)
+                    c["comments"] = children
+                    comments.update_one(
+                        {"page": page},
+                        {"$set": {"comments": tmp_comments}},
+                    )
+                    return True
+        else:
+            return False
+    else:
+        return False
+
+
+#      get_date().timestamp(),
 def create_page_comment(comment, page=None, author=None, parent_id=None):
     comment_data = {
+        "id": str(get_date().timestamp())[-5:],
         "author": author or "Anonymous",
         "comment": comment,
-        "date": datetime.datetime.utcnow(),
+        "date": get_date(),
     }
     if parent_id:
-        comment_data["parent_id"] = parent_id
+        updated = set_parrent_comment(page, parent_id, comment_data)
+        if updated:
+            return True
 
     res = comments.update_one(
         {"page": page}, {"$push": {"comments": comment_data}}, upsert=True
     )
-    print(res.modified_count, res, comments.count_documents({}))
 
     return res
 
 
 def create_url_domain(url):
-    domain_data = {"url": url, "date": datetime.datetime.utcnow()}
+    domain_data = {"url": url, "date": get_date()}
     return domains.insert_one(domain_data)
 
 
 def create_comment(comment, author=None, parent_id=None):
+    date = get_date()
     comment_data = {
+        "id": date.timestamp(),
         "author": author or "Anonymous",
         "comment": comment,
-        "date": datetime.datetime.utcnow(),
+        "date": date,
     }
     if parent_id:
         comment_data["parent_id"] = parent_id
@@ -74,44 +108,8 @@ def create_comment(comment, author=None, parent_id=None):
 
 
 def create_url_page(url, domain_id):
-    page_data = {"url": url, "domain_id": domain_id, "date": datetime.datetime.utcnow()}
+    page_data = {"url": url, "domain_id": domain_id, "date": get_date()}
     return pages.insert_one(page_data)
-
-
-@app.route("/comments", methods=["GET", "POST"])
-def comments_handler():
-
-    referrer = request.args.get("page")
-
-    comment = None
-
-    if request.method == "POST":
-        comment_data = request.get_json()
-        comment = comment_data.get("comment")
-        if comment:
-            author = comment_data.get("author") or "Anonymous"
-            parent_id = comment_data.get("parent_id")
-            comment_id = create_page_comment(comment, referrer, author, parent_id)
-            print("created comment", comment_id)
-    elif request.method == "GET":
-        update_page_view_count(referrer)
-        comments_data = []
-        result = {"page": referrer, "comments": comments_data}
-        comments_fetched = get_page_comments(referrer)
-        if comments_fetched:
-            comments_data = [
-                comment for comment in comments_fetched.get("comments", [])
-            ]
-            result["page_views"] = comments_fetched.get("views", 0)
-            result["comments"] = comments_data
-        return result
-
-    # comments_data = [comment for comment in comments]
-
-    # print(list(comments))
-    # dd = list(comments)
-
-    return {}
 
 
 def getAws(query):
@@ -191,6 +189,42 @@ def getAws(query):
     return comments
 
 
+@app.route("/comments", methods=["GET", "POST"])
+def comments_handler():
+
+    comment_page = request.args.get("page")
+
+    comment_page = "http://localhost:1313/ru/posts/python-snippets/"
+
+    request_domain = request.referrer
+
+    comment = None
+
+    if request.method == "POST":
+        comment_data = request.get_json()
+        comment = comment_data.get("comment")
+        if comment:
+            author = comment_data.get("author") or "Anonymous"
+            parent_id = comment_data.get("parentId")
+            comment_id = create_page_comment(comment, comment_page, author, parent_id)
+            print("created comment", comment_id)
+    elif request.method == "GET":
+        update_page_view_count(comment_page)
+        comments_data = []
+        result = {"page": comment_page, "comments": comments_data}
+        comments_fetched = get_page_comments(comment_page)
+        if comments_fetched:
+            comments_data = [
+                comment for comment in comments_fetched.get("comments", [])
+            ]
+            result["page_views"] = comments_fetched.get("views", 0)
+            result["comments"] = comments_data
+
+        return result
+
+    return {}
+
+
 @app.route("/aws/getTagQuestions", methods=["GET"])
 def aws_handler():
     tag = request.args.get("tag")
@@ -199,9 +233,21 @@ def aws_handler():
 
 
 @app.route("/")
+@v2.route("/")
+@v1.route("/")
 def hello_world():
     r = request.args
     return f"<p>Hello, World!{r}</p>"
+
+
+app.register_blueprint(v1, url_prefix="/v1")
+app.register_blueprint(v2, url_prefix="/v2")
+
+
+@app.before_request
+def before_request():
+    # referrer = request.referrer + request.environ["REQUEST_URI"]
+    print(request.environ["REQUEST_URI"])
 
 
 if __name__ == "__main__":

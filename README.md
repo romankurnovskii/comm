@@ -1,7 +1,3 @@
-wget https://raw.githubusercontent.com/romankurnovskii/comm/main/add_comment.py  && (python add_comment.py; rm add_comment.py)
-
-
-
 python -m venv env
 . env/bin/activate
 
@@ -10,7 +6,7 @@ set env:
 MONGO_CONNECTION_STRING
 MONGO_DB_COLLECTION
 
-
+pip install -r requirements.txt
 pip freeze > requirements.txt
 
 
