@@ -247,7 +247,8 @@ app.register_blueprint(v2, url_prefix="/v2")
 @app.before_request
 def before_request():
     # referrer = request.referrer + request.environ["REQUEST_URI"]
-    print(request.environ["REQUEST_URI"])
+    # print(request.environ["REQUEST_URI"])
+    print(request.environ)
 
 
 if __name__ == "__main__":
