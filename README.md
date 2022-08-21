@@ -25,7 +25,7 @@ docker run -d \
     -p 27017:27017 \
     --name test-mongo \
     -v data-vol:/data/db \
-    mongo:5.0.9
+    mongo
 
 docker run -d --network my-network --name mylocalmongo \
 	-e MONGO_INITDB_ROOT_USERNAME=mongoadmin \
